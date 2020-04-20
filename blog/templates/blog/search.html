@@ -1,0 +1,38 @@
+<div class="cus-header mb-3 mt-3">
+    <div class="cus-indicator"></div>
+    <h1>search results</h1>
+</div>
+
+<div class="cus-section mb-3 mt-3">
+    <div class="row" id="search_results">
+
+    </div>
+</div>
+
+<script>
+
+    var search_handler = data => {
+        console.log(data);
+        if (data.not_found){
+            $(`
+                <div class="col-12">
+                    <h3>nothing found.</h3>
+                    <ul>
+                        <li> please ensure you have typed correct words </li>
+                        <li> try other words </li>
+                        <li> <a onclick="render('home.html')" href="#">return</a>    
+                    </ul>
+                    
+                </div>
+            `).appendTo("#search_results");
+            return;
+        };
+        for (var i in data){
+            post_data = data[i];
+            insertPost(post_data, dist="#search_results");
+        }
+    }
+
+    // gets query directly from navbar and sends over server
+    search_post(search_handler);
+</script>

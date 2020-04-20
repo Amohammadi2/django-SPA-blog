@@ -1,0 +1,84 @@
+<div class="cus-header mb-5">
+    <div class="cus-indicator"></div>
+    <h1>your comments</h1>
+</div>
+
+<div style="float: left; clear:both;"></div>
+
+<div class="my-comments" style="float: left; width:100%;">
+    <div class="table-magic-line-hor"></div>
+    <div class="table-magic-line-ver"></div>
+    <table class="comments-section">
+        <tr class="header-row">
+            <td>comment text</td>
+            <td>action(s)</td>
+            <td>post</td>
+        </tr>
+    </table>
+</div>
+
+<script>
+
+    function insert_table_row(comment){
+        // resolve the post
+        callApi("/posts/"+comment.post+"/", "GET", {}, data => {
+            // data is a single post object
+            var $new_comment = $(`
+            <tr>
+                <td data-comment-id="${comment.id}">${comment.text}</td>
+                <td>
+                    <button class="btn btn-danger">
+                        <span class="material-icons">delete</span>
+                    </button>
+                </td>
+                <td data-post="${data.id}">
+                    <span class="post-ref">
+                        <a>${data.headline}</a>
+                    </span>
+                </td>
+            </tr>
+            `);
+            // move magic line beside the table on mouse hover on table
+            $new_comment.children("td").hover(event => {
+                var $tr = event.target;
+                var position = $($tr).position();
+                var top = position.top;
+                var left = position.left;
+
+                // set the offset of the magic line from top
+                $(".table-magic-line-hor").css("top", top);
+
+                // set the height of the magic line according to the tr element
+                $(".table-magic-line-hor").height($($tr).height()+25);
+
+                $(".table-magic-line-ver").css("left", left);
+                $(".table-magic-line-ver").width($($tr).width()); 
+            });
+            // event listener to show the post that the comment is realted to
+            $new_comment.children("td").children("span.post-ref").click(event => {
+                add_param("id", data.id);
+                render("render_post.html");
+            });
+            // event listenr to delete the comment
+            $new_comment.children("td").children("button.btn.btn-danger").click(event => {
+                callApi(`/comments/${comment.id}/delete_comment/`, "DELETE", {}, () => {
+                    //("comment deleted");
+                    $($new_comment).fadeOut(500);
+                });
+            });
+
+            $new_comment.appendTo(".comments-section");
+        });
+    }
+
+    $(document).ready(() => {
+        callApi("/comments/get_comments_of_user/", "GET", {}, data => {
+            //(data);
+            // data is json dataset of comment objects
+            for (var i in data){
+                comment_item = data[i]; // this is a comment object
+                insert_table_row(comment_item);
+            }
+        });
+    });
+</script>

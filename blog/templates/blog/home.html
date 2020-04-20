@@ -1,0 +1,39 @@
+<div class="cus-header mb-5 mt-5">
+    <span class="cus-indicator"></span>
+    <h1>Newest posts:</h1>
+</div>
+<div class="cus-section mb-5">
+    <div class="row" id="news">
+        
+    </div>
+</div>
+<div class="cus-header mb-5 mt-5">
+    <span class="cus-indicator"></span>
+    <h1>Popular posts</h1>
+</div>
+<div class="cus-section mb-5">
+    <class class="row" id="pops">
+
+    </class>
+</div>
+<div class="cus-header mb-5 mt-5">
+    <span class="cus-indicator"></span>
+    <h1>Controversial posts</h1>
+</div>
+<div class="cus-section mb-5">
+    <div class="row" id="conts">
+
+    </div>  
+</div>
+
+<script>
+    // get new posts
+    callApi("/posts/get_new_posts/", "GET", {}, getNewPosts);
+
+    // get popular posts
+    callApi("/posts/get_pop_posts", "GET", {}, getPopPosts);
+
+    // get controversial posts
+    callApi("/posts/get_controversial_posts", "GET", {}, getContPosts);
+
+</script>

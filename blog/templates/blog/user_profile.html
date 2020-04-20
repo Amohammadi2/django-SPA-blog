@@ -1,0 +1,64 @@
+<div class="upload_progress_bar">
+    <span class="precent_count">0%</span>
+    <span>complete</span>
+    <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+
+<div class="cus-header mt-5 mb-5">
+    <div class="cus-indicator"></div>
+    <h1>user profile</h1>
+</div>
+
+<div class="cus-section">
+    <input type="hidden" name="profile_id" id="profile_id">
+    <hr>
+    <img id="image_preview" src="some/default/path" alt="">
+
+    <form id="image_form">
+        <label for="profile_image" class="btn btn-secondary">change profile image</label> <br>
+        <input type="file" name="profile_image" id="profile_image" style="display: none !important;">
+        <input type="submit" value="upload" class="btn btn-primary">
+    </form>
+    <hr>
+
+    <form id="info_form">
+        {{profile_info_form.bio}}
+        {{profile_info_form.phone}}
+        <input type="submit" value="update" class="btn btn-primary">
+    </form> 
+    <hr>
+
+</div>
+
+<script>
+
+    $("#image_form").submit(event => {
+        event.preventDefault();
+        upload_file("image_form", `/profiles/${ $("input#profile_id").val() }/update_profile_image/`, "POST", data => {
+            $("#image_preview").attr("src", data.url);
+        });
+        console.log("invoked");
+    })
+
+    $("#info_form").submit(event => {
+        event.preventDefault();
+
+        callApi(`/profiles/${ $("input#profile_id").val() }/update_profile_info/`, "POST", {
+            "bio": $("#id_bio").val(),
+            "phone": $("#id_phone").val(),
+        })
+    });
+
+
+    function get_initial_info(data){
+        console.log(data);
+        $("#id_bio").val(data.profile.bio);
+        $("#id_phone").val(data.profile.phone);
+        $("#image_preview").attr("src", data.profile.photo);
+        $("input#profile_id").val(data.profile.id);
+    }
+
+    callApi("/profiles/get_user_profile/", "GET", {}, get_initial_info)
+</script>

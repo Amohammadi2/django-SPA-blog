@@ -1,0 +1,52 @@
+<div class="cus-section">
+    <div class="row">
+        <div class="col-sm-6">
+            <h1>login</h1>
+            <form action="" id="l-form">
+                {{user_login_form.username}}
+                {{user_login_form.password}}
+                <input type="submit" value="login" class="btn btn-primary">
+            </form>
+        </div>
+        <div class="col-sm-6">
+            <h1>signup</h1>
+            <form action="" id="s-form">
+                {{user_signup_form.username}}
+                {{user_signup_form.password}}
+                {{user_signup_form.first_name}}
+                {{user_signup_form.last_name}}
+                {{user_signup_form.email}}
+                <input type="submit" value="sign up" class="btn btn-primary">
+            </form>
+        </div>
+    </div>
+</div>
+<div class="mt-5" style="float: left; clear:both;"></div>
+
+<script>
+    $(document).ready(function() {
+        $("#l-form").submit(function (e){
+            // prevent the post from beeing sent
+            e.preventDefault();
+            // instead make a request by your own
+            user_login(
+                $("#l-form > #id_username").val(),
+                $("#l-form > #id_password").val(),
+            );
+            this.reset();
+        });
+        $("#s-form").submit(function (e){
+            // prevent the post from beeing sent
+            e.preventDefault();
+            // instead make a request by your own
+            user_signup(
+                $("#s-form > #id_username").val(),
+                $("#s-form > #id_password").val(),
+                $("#s-form > #id_first_name").val(),
+                $("#s-form > #id_last_name").val(),
+                $("#s-form > #id_email").val(),
+            );
+            this.reset();
+        });
+    });
+</script>

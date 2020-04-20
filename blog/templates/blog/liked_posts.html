@@ -1,0 +1,21 @@
+<div class="cus-header">
+    <div class="cus-indicator"></div>
+    <h1>liked posts</h1>
+</div>
+
+<div class="cus-section">
+    <div class="row" id="liked_posts"></div>
+</div>
+
+<script>
+    // get the posts from server
+    function get_liked_posts(data){
+        for (var i in data){
+            console.log(data[i]);
+            insertPost(data[i], "#liked_posts");
+        }
+    }
+
+    // call the api
+    callApi("/posts/user_liked_posts/", "GET", {}, get_liked_posts);
+</script>

@@ -1,0 +1,158 @@
+<div class="modal fade" id="editingModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+        
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">edit the field</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="modal-body">
+                <input type="text" name="editField" id="editField" class="form-control">
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">discard changes</button>
+                <button type="button" class="btn btn-success" onclick="update_field();" id="save_field">save changes</button>
+            </div>
+            
+        </div>
+    </div>
+</div>
+<div class="admin-login">
+    <div class="cus-header mb-4 mt-4">
+        <div class="cus-indicator"></div>
+        <h1>header section</h1>
+    </div>
+
+    <div class="cus-section" id="site_header_section">
+        <div>
+            <h4>header image address <button class="btn btn-secondary modal-open">edit</button></h4>
+            <p id="cus-feild"><span class="value" id="header_img_addr"></span></p>
+        </div>
+        <hr>
+        <div>
+            <h4>header title <button class="btn btn-secondary modal-open">edit</button></h4>
+            <p class="cus-feild"><span class="value" id="header_title"></span></p>
+        </div>
+        <hr>
+        <div>
+            <h4>header description <button class="btn btn-secondary modal-open">edit</button></h4>
+            <p class="cus-field"><span class="value" id="header_description"></span></p>
+        </div>
+        <hr>
+        <button class="btn btn-success" id="header_change_save">save changes</button>
+    </div>
+
+    <div class="cus-header mb-4 mt-4">
+        <div class="cus-indicator"></div>
+        <h1>navbar section</h1>
+    </div>
+
+    <div class="cus-section" id="site_navbar_section">
+        <div>
+            <h4>navbar background-color <button class="btn btn-secondary modal-open">edit</button></h4>
+            <p class="cus-field"><span class="value" id="nav_color_value"></span> <span class="color-sample" id="nav_color"></span></p>
+        </div>
+        <hr>
+        <div>
+            <h4>navbar magic line background-color <button class="btn btn-secondary modal-open">edit</button></h4>
+            <p class="cus-field"><span class="value" id="magic_color_value"></span> <span class="color-sample" id="magic_color"></span></p>
+        </div>
+        <hr>
+        <button class="btn btn-success" id="navbar_change_save">save changes</button>
+    </div>
+</div>
+
+<div class="no-user-login">
+    <h1>just admins can access this page</h1>
+</div>
+
+<script>
+    // checks if the user is admin or not
+    check_auth(); 
+    // opens the modal when user clicks on edit button
+    $(".modal-open").click(event => {
+        $("#editingModal").modal("show");
+        var value = $(event.target).parent().siblings("p").children("span.value");
+        $("#editField").val(value.text());
+        $("#editingModal").data("fieldAddr", value.attr("id"));
+    })
+
+    // hides the modal when user clicks on save changes button
+    $("#save_field").click(event => {
+        $("#editingModal").modal("hide");
+    });
+
+    function apply_color_codes(){
+        // apply the color codes
+        var magic_line_background = $("#magic_color").siblings(".value").text();
+        $("#magic_color").css("background-color", magic_line_background);
+        var nav_background = $("#nav_color").siblings(".value").text();
+        $("#nav_color").css("background", nav_background);
+    }
+
+    apply_color_codes();
+
+    // this function updates values of the fields
+    function update_field(){
+        // get the field addr from modal and asign it the new value
+        var new_val = $("#editField").val();
+        // get the id of field
+        var field_id = $("#editingModal").data("fieldAddr");
+        // assgin the value
+        $("#"+field_id).text(new_val);
+        apply_color_codes();
+    }
+
+    // update the header section and add it to database
+    function update_header(){
+        callApi("/websiteinfo/1/update_header_section/", "POST", {
+            title: $("#header_title").text(),
+            description: $("#header_description").text(),
+            image_addr: $("#header_img_addr").text(),
+        });
+    }
+
+    // update the header section when user clicks on save changes button
+    $("#header_change_save").click(event => {
+        update_header();
+    })
+
+    // update the navbar section
+    function update_navbar(){
+        callApi("/websiteinfo/1/update_navbar_section/", "POST", {
+            magic_color: $("#magic_color_value").text(),
+            navbar_color: $("#nav_color_value").text(),
+        });
+    }
+
+    // update the navbar seciton when user clicks on save changes button
+    $("#navbar_change_save").click(event => {
+        update_navbar();
+    });
+
+
+    // get the informations from server
+    function get_initial_info(){
+        callApi("/websiteinfo/1/", "GET", {}, data => {
+            // insert the informations
+            // #magic_color_value #nav_color_value #header_description 
+            // #header_title #header_img_addr
+            $("#header_title").text(data.header_title);
+            $("#header_description").text(data.header_description);
+            $("#header_img_addr").text(data.header_image_addr);
+            $("#magic_color_value").text(data.navbar_magic_line_color);
+            $("#nav_color_value").text(data.navbar_background_color);
+            apply_color_codes();
+        });
+    }
+
+    get_initial_info();
+
+
+    
+</script>

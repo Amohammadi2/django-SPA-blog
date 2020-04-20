@@ -1,0 +1,39 @@
+<div class="cus-section">
+    <div class="row" id="myposts">
+        
+    </div>
+</div>
+
+
+<script>
+     function getposts(data){
+        getMyPosts(data);
+        setTimeout(() => {
+            $(`<span class="material-icons push edit" onclick="render('upload.html');">edit</span>`).appendTo(".note-footer");
+            $(`<span class="material-icons push delete">delete</span>`).appendTo(".note-footer");
+            // edit button click event
+            $(".push.edit").click(event => {
+                // get the id of related post span < note-footer ~ input
+                var related_id = $(event.target).parent().siblings("input").val();
+                // add parameters in url
+                add_param("update", "true");
+                add_param("id", related_id);
+            });
+            // event listener for delete button
+            $(".push.delete").click( event => {
+                // get the id of post
+                var related_id = $(event.target).parent().siblings("input").val();
+                callApi(`/posts/${related_id}/`, "DELETE", {}, (data=null) => {
+                    // show the notification in page when completed
+                    show_notification("your post has been deleted", "post deleted", 5000);
+                    // clear the posts section
+                    $("#myposts").html(" ");
+                    // reload the posts
+                    callApi("posts/get_posts_related_to_user/", "GET", {}, getposts);
+                })
+            });
+        }, 50);
+    }
+    callApi("/posts/get_posts_related_to_user/", "GET", {}, getposts);
+
+</script>

@@ -1,0 +1,11 @@
+<script>
+    $(document).ready(() => {
+        // get all categories
+        callApi("/categories/", "GET", {}, data => {
+            for (var i in data){
+                var category = data[i];
+                insertCategory(category);
+            }
+        });
+    });
+</script>

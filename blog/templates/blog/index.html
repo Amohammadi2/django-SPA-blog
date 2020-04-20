@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html dir="auto">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=screen-width, initial-scale=1.0">
+    <title>{{page_title}}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+    {%load static%}
+    <link rel="stylesheet" type="text/css" href="{%static 'blog/css/style.css'%}">
+    <link rel="stylesheet" type="text/css" href="{%static 'blog/css/prism.css'%}">
+    <link rel="stylesheet" type="text/css" href="{%static 'blog/css/'%}">
+    <script src="{%static 'blog/js/style.js'%}"></script>
+    <script src="{%static 'blog/js/funcs.js'%}"></script>
+    <script src="{%static 'blog/js/prism.js'%}"></script>
+    <style>
+        .cus-header-img-container{
+            background-image: url("{{page_header_image_addr}}");
+        }
+        .cus-indicator{
+            background-color: {{navbar_background_color}} !important;
+        }
+        .note-header{
+            border-bottom: 2px solid {{navbar_background_color}} !important;
+        }
+        .ribbon{
+            background-color: {{navbar_background_color}} !important;
+        }
+        tr.header-row > td, .table-magic-line-ver, .table-magic-line-hor{
+            background-color: {{navbar_background_color}} !important;
+        }
+        img{
+            border: 2px solid {{navbar_background_color}} !important;
+        }
+    </style>
+</head>
+<body spellcheck="false">
+    <div class="notification">
+        <span class="cancel-notification" onclick="hide_notification();">X</span>
+        <div class="notification-header"></div>
+        <div class="notification-body">
+
+        </div>
+    </div>
+    <div class="dark-area"></div>
+    <div class="side-bar" id="sb">
+        <div class="side-bar-item admin-login" onclick="render('edit_site_style.html');">
+            <span class="side-bar-item-anim"></span>
+            <span>appearance</span>
+        </div>
+        <div class="side-bar-item admin-login" onclick="render('send_post.html')">
+            <span class="side-bar-item-anim"></span>
+            <span>new post</span>
+        </div>
+        <div class="side-bar-item admin-login" onclick="render('my_posts.html');">
+            <span class="side-bar-item-anim"></span>
+            <span>my posts</span>
+        </div>
+        <div class="side-bar-item admin-login" onclick="render('categories.html');">
+            <span class="side-bar-item-anim"></span>
+            <span>categories</span>
+        </div>
+        <div class="side-bar-item user-login" onclick="render('liked_posts.html');">
+            <span class="side-bar-item-anim"></span>
+            <span>liked posts</span>
+        </div>
+        <div class="side-bar-item user-login" onclick="render('my_comments.html');">
+            <span class="side-bar-item-anim"></span>
+            <span>comments</span>
+        </div>
+        <div class="side-bar-item user-login" onclick="render('user_profile.html');">
+            <span class="side-bar-item-anim"></span>
+            <span>profile</span>
+        </div>
+        <div class="side-bar-item user-login" onclick="user_logout();">
+            <span class="side-bar-item-anim"></span>
+            <span>logout</span>
+        </div>
+        <div class="side-bar-item no-user-login" onclick="render('login_signin.html');">
+            <span class="side-bar-item-anim"></span>
+            <span>login/signup</span>
+        </div>
+    </div>
+    <div class="cus-header-img-container">
+        <div class="cus-top-header">
+            <h1>{{page_title}}</h1>
+            <p>
+                {{page_description}}
+            </p>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-md navbar-dark">
+        <a class="navbar-brand" href="#" onclick="render('home.html');">Home</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul class="navbar-nav nav-pills">
+                <li class="nav-item ml-2 mt-2 material-icons" id="side-bar-toggler">
+                    menu
+                </li>
+                <li class="nav-item ml-2 mt-2 mr-2" onclick="render('send_feedback.html');">
+                    <a class="nav-link" href="#">feedback</a>
+                </li>
+                <li class="nav-item ml-2 mt-2 mr-2" onclick="render('posts_by_categories.html');">
+                    <a class="nav-link" href="#">categories</a>
+                </li>
+                <li class="nav-item ml-2 mt-2 mr-2" onclick="render('render_all.html');">
+                    <a href="#" class="nav-link">all</a>
+                </li>
+                <li class="nav-item ml-2 mt-2 mr-2">
+                    <input type="search" class="form-control" id="search">
+                </li>    
+                <li class="nav-item ml-2 mt-2 mr-2">
+                    <button type="button" class="btn btn-light" id="search_button" onclick="render_search_page();">Search</button>
+                </li>
+            </ul>
+        </div>
+        <span class="magic-line"></span>  
+    </nav>
+    <div class="page-preloader">
+        <div class="spinner-border text-light"role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <div class="container mt-5">
+        
+    </div>
+    <div class="mb-5" style="float: left; clear: both;"></div>
+    <script>
+        // declare the colors for stuff
+        $("nav.navbar").attr("style", "background-color: {{navbar_background_color}} !important;");
+        $(".magic-line").attr("style", "background-color: {{navbar_magic_line_color}} !important;");
+
+        var nav_color = "background-color: {{navbar_background_color}} !important;";
+        var magic_color = "background-color: {{navbar_magic_line_color}} !important;";
+
+        $(".cus-indicator").attr("style", nav_color);
+    </script>
+</body>
+</html>

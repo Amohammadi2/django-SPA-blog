@@ -1,0 +1,22 @@
+<div class="cus-header mb-5 mt-5">
+    <div class="cus-indicator"></div>
+    <h1>send your feedbacks here</h1>
+</div>
+
+<div class="cus-section">
+    <p class="mt-3 mb-3">we're glad recieving your feedbacks. we can make better websites with your suggestions and opinions</p>
+    <form id="feedback">
+        {{feedback_form.text}}
+        <input type="submit" class="btn btn-primary" value="send feedback">
+    </form>
+</div>
+
+<script>
+    $("#feedback").submit( event => {
+        event.preventDefault(); // prevent the post from being sent
+
+        callApi("/feedbacks/create_feedback/", "POST", {text: $("#id_text").val()});
+
+        document.getElementById("feedback").reset();
+    } );
+</script>

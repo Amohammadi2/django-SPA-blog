@@ -1,0 +1,151 @@
+<h1 class="display-3" id="post-header" style="direction: rtl !important;"></h1>
+<div class="post-info">
+    <span class="info-container">
+        <span class="material-icons" data-toggle="tooltip" title="comments" id="p-comment">comment</span>
+        <span class="info" id="comments_count"></span>
+    </span>
+    <span class="info-container">
+        <span class="material-icons" data-toggle="tooltip" title="likes" id="p-like">loyalty</span>
+        <span class="info" id="likes_count"></span>
+    </span>
+    <span class="info-container">
+        <span class="material-icons" data-toggle="tooltip" title="author" id="p-author">insert_drive_file</span>
+        <span class="info" id="author"></span>
+    </span>
+    <span class="info-container">
+        <span class="material-icons" data-toggle="tooltip" title="published date" id="p-pubdate">date_range</span>
+        <span class="info" id="pubdate"></span>
+    </span>
+    <span class="info-container">
+        <span class="material-icons" data-toggle="tooltip" title="last modified" id="p-moddate">update</span>
+        <span class="info" id="moddate"></span>
+    </span>
+</div>
+<div id="post-body"></div>
+<hr>
+<h1>send comment</h1>
+<form action="" class="user-login" id="send-comment">
+    {{comment_form.text}}
+    <input type="submit" value="send comment" class="btn btn-primary">
+</form>
+<p class="no-user-login">
+    please sign in to your account to send comments <br><br><br>
+    <button class="btn btn-secondary" onclick="render('login_signin.html')">login/sign up</button>
+</p>
+
+
+<h1>comments</h1>
+<div id="post-comments">
+</div>
+
+<div style="margin-bottom: 200px;"></div>
+
+<script>
+    'use strict';
+    // as usual
+    check_auth(); // check the user authentication
+    
+    function safe_html(htmlCode){
+        htmlCode = htmlCode.replace(/<.*script.*>/g, "");
+        return htmlCode;
+    }
+
+    // get the post information from server
+    callApi("/posts/"+get_param("id")+"/", "GET", {}, data => {
+        //(data)
+        // the headline
+        $("#post-header").html(data.headline);
+        // render any markdown used in the post
+        data.bodyText = render_markdown(data.bodyText);
+        // add the bodyText
+        $("#post-body").html(safe_html(data.bodyText)); // use safe_html method to avoid XSS attacks
+        // add number of comments
+        $("#comments_count").text(data.comments_count);
+        // add number of likes
+        $("#likes_count").text(data.likes_count);
+        // who is the author? :)
+        $("#author").text(data.author.username);
+        // published date
+        $("#pubdate").text(data.pubdate);
+        // modified date
+        $("#moddate").text(data.moddate);
+        // insert the comments
+        //(data.comment_set);
+        for (var i in data.comment_set){
+            insert_comment(data.comment_set[i], "#post-comments");
+        }
+        check_auth();
+        
+    });
+
+    // scroll down to the comments box when use clicked on comments_count button
+    $("#p-comment").on("click", event => {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $("#send-comment").offset().top - 100
+        }, 800);
+    });
+
+    // send comment post
+    $("#send-comment").submit(event => {
+        // prevent the post from being submited
+        event.preventDefault();
+
+        // send the data to api
+        callApi("/comments/create_new_comment/?id="+get_param("id"), "POST", {
+            text: $("#id_text").val(),
+        }, data => {
+            // now we just need to update the comment list
+            // first of all clear the comments
+            $("#post-comments").html(" ");
+
+            // now add the comments
+            callApi("/comments/get_comments_related_to/", "POST", {id: get_param("id")}, data => {
+                //(data);
+                for (var i in data){
+                    insert_comment(data[i], "#post-comments");
+                }
+            });
+            
+        })
+
+        // finally reset the post
+        event.target.reset();
+    });
+
+    // this function likes and dislikes the post
+    $("#p-like").click(event => {
+        // call the api
+        // get_param function gets the value of id parameter located in url
+        callApi(`/posts/${get_param("id")}/toggle_like/`, "POST", {}, data => {
+            // number of counts
+            var count = $("#likes_count").text()
+            count = count * 1 // conver it to number
+            
+            if(data.disliked){
+                $("#p-like").css("background-color", "#138c2c");
+                // decrease the likes count
+                $("#likes_count").text(count - 1);
+            }
+            else if (data.liked){
+                $("#p-like").css("background-color", "red");
+                // increase the likes count
+                $("#likes_count").text(count + 1);
+            }
+
+        });  
+    });
+
+    // checks weather the user has liked the current post
+    function has_user_liked(){
+        callApi(`/posts/${get_param("id")}/has_user_liked/`, "GET", {}, data => {
+            if (data.has_liked){
+                $("#p-like").css("background-color", "red");
+            }else{
+                $("#p-like").css("background-color", "#138c2c");
+            }
+        });
+    }
+
+    // check if user has liked the post
+    has_user_liked();
+</script>

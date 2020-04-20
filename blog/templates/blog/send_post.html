@@ -1,0 +1,293 @@
+<div class="modal fade" id="insert_modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">insert block</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="modal-body">
+                <p>chose the color of the block</p>
+                <select class="form-control" name="block_color" id="block_color">
+                    <option value="bg-primary">blue</option>
+                    <option value="bg-secondary">gray</option>
+                    <option value="bg-danger">red</option>
+                    <option value="bg-success">green</option>
+                    <option value="bg-warning">orange</option>
+                </select>
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button class="btn btn-primary" id="insert_button">Insert</button>
+            </div>
+            
+        </div>
+    </div>
+</div>
+<div class="cus-section user-login">
+    <form action="" enctype="multipart/form-data" id="upload_form">
+        {%csrf_token%}
+        {{post_form.headline}}
+        {{post_form.summery}}
+        <div class="ribbon">
+            <span id="italic" class="material-icons">format_italic</span>
+            <span id="bold" class="material-icons">format_bold</span>
+            <span id="underline" class="material-icons">format_underlined</span>
+            <span id="superscript" class="fa fa-superscript"></span>
+            <span id="subscript" class="fa fa-subscript"></span>
+            <span id="orderedList" class="material-icons">format_list_numbered</span>
+            <span id="unorderedList" class="material-icons">format_list_bulleted</span>
+            <span id="redo" class="material-icons">redo</span>
+            <span id="undo" class="material-icons">undo</span>
+            <span id="photo" class="material-icons">insert_photo</span>
+            <span id="link" class="material-icons">insert_link</span>
+            <span id="unlink" class="fa fa-unlink"></span>
+            <span id="justifyleft" class="material-icons">format_align_left</span>
+            <span id="jusifycenter" class="material-icons">format_align_center</span>
+            <span id="justifyright" class="material-icons">format_align_right</span>
+            <span id="copy" class="material-icons">content_copy</span>
+            <span id="paste" class="material-icons">content_paste</span>
+            <span id="cut" class="material-icons">content_cut</span>
+            <span id="codeBlock">blocks</span>
+            <span id="code" class="far fa-file-code"></span>
+            <span>
+                <select name="fontSize" id="fontSize">
+                </select>
+            </span>
+        </div>
+        <div class="cus-form">
+            <iframe name="bodyText" frameborder="0"></iframe>
+        </div>
+        <p>category</p>
+        {{post_form.categories}}
+        <input type="submit" value="send the post" class="btn btn-primary form-control">
+    </form>
+</div>
+<div class="mt-5" style="float: left; clear:both;"></div>
+
+<script>
+    'use strict';
+    // check the authentication status
+    check_auth();
+    function uploadHandler(data){
+        //(data);
+    }
+    $(document).ready(() => {
+        var url_to_send_post = "";
+        // check if this is a new post or a existing post that needs to update
+        if (get_param("update")){
+            // configure the url to send the post
+            url_to_send_post = `/posts/${get_param("id")}/update_post/`;
+            // get post data from django backend
+            callApi(`/posts/${get_param("id")}`, "GET", {}, data => {
+                // check if the post exists in the database or not
+                if (data.headline)
+                    // then add them to the form
+                    // add the headline
+                    $("#id_headline").val(data.headline);
+                    // add categories
+                    for (i in data.categories){
+                        // select the options from categories selection where value of option equals
+                        $(`#id_categories option[value="${data.categories[i]}"]`).prop("selected", true);
+                    }
+                    $(editor.body).html(data.bodyText);
+                    $("#id_summery").val(data.summery);
+            });
+        }else{
+            url_to_send_post = `/posts/create_new_post/`
+        }
+
+        // delete this parameters
+        del_param("update");
+        del_param("id");
+
+        // how will the forms be submited
+        $("form").submit(function (e){
+            e.preventDefault();
+            //("invoked");
+            // getting all the data from the form
+            callApi(url_to_send_post, "POST", {
+                "headline": $("#id_headline").val(),
+                "bodyText": $(bodyText.document.body).html(),
+                "categories": $("#id_categories").val(),
+                "summery": $("#id_summery").val(),
+            }, uploadHandler);
+            document.getElementById("upload_form").reset();
+            editor.body.innerHTML = "";
+        });
+
+        // turn on the design mode for the iframe
+        var editor;
+        $(bodyText.document).ready(() => {
+            editor = bodyText.document;
+            editor.designMode = "on";
+            //(bodyText.document.designMode);
+        })
+        
+
+        // add font size offers to the fontSize selection
+        for (var i=2; i <= 10; i++){
+            $(`<option value="${i}">${i}</option>`)
+            .appendTo("#fontSize");
+        }
+
+        // event listeners for incoming events
+        // this makes the SELECTED text italic
+        $("#italic").click(() => {
+            editor.execCommand("Italic", false, null);
+        });
+        
+        // this makes the SELECTED text bold
+        $("#bold").click(() => {
+            editor.execCommand("Bold", false, null);
+        });
+
+        // this underlines the SELECTED text
+        $("#underline").click(() => {
+            editor.execCommand("Underline", false, null);
+        });
+
+        // this makes an ordered list
+        $("#orderedList").click(() => {
+            editor.execCommand("insertOrderedList", false, null);
+        });
+
+        // this makes an unordered list
+        $("#unorderedList").click(() => {
+            editor.execCommand("insertUnorderedList", false, null);
+        });
+
+        // redo
+        $("#redo").click(() => {
+            editor.execCommand("redo", false, null);
+        })
+
+        //undo
+        $("#undo").click(() => {
+            editor.execCommand("undo", false, null);
+        })
+
+        // change font size of the text
+        $("#fontSize").change(() => {
+            editor.execCommand("fontSize", false, $("#fontSize").val());
+        })
+
+        // inserts link
+        $("#link").click(() => {
+            // a modal will provide this in future
+            var link = prompt("enter url", "http://");
+            editor.execCommand("createlink", false, link);
+        });
+
+        // unlinks
+        $("#unlink").click(() => {
+            editor.execCommand("unlink", false, null);
+        });
+
+        // justify left
+        $("#justifyleft").click(() => {
+            editor.execCommand("justifyLeft", false, null);
+        });
+
+        // justify center
+        $("#jusifycenter").click(() => {
+            editor.execCommand("justifyCenter", false, null);
+        });
+
+        // justify right
+        $("#justifyright").click(() => {
+            editor.execCommand("justifyRight", false, null);
+        });
+
+        // insert a photo
+        $("#photo").click(() => {
+            var image_address = prompt("enter image URL", "http://");
+            editor.execCommand("insertImage", false, image_address);
+        })
+
+        // add subscript
+        $("#subscript").click(() => {
+            editor.execCommand("subscript", false, null);
+        });
+
+        // add superscript
+        $("#superscript").click(() => {
+            editor.execCommand("superscript", false, null);
+        });
+
+        // copy, cut, paste
+        $("#cut, #copy, #paste").click(event => {
+            var action = $(event.target).attr("id");
+            console.log(action);
+            editor.execCommand(action);
+        })
+
+        $("#code").click(() => {
+            // get the selection
+            var selection = bodyText.getSelection();
+            // get the first range
+            var range = selection.getRangeAt(0);
+            // now collapse the range if it isn't collapsed
+            if(!range.collapsed){
+                range.collapse(true);
+            }
+            // and create the block
+            var block_to_insert = create_node("code", [
+                create_node("div", [
+                    create_text_node("enter your code in here;"),
+                ]),
+            ], "language-python line-numbers");
+            // insert the node into selection
+            range.insertNode(block_to_insert);
+        });
+
+    });
+    
+    // insert all meta data to the iframe
+    $(bodyText.document).ready(() => {
+        $(document.head).children("link, script").clone().appendTo(bodyText.document.head);
+
+        // insert a block in iframe
+        $("#codeBlock").click(() => {
+            // open up the modal
+            $("#insert_modal").modal("show");
+        })
+
+    });
+
+    $("#insert_button").click(() => {
+        // get the selection
+        var user_selection = bodyText.getSelection();
+        // we will insert block here
+        var first_selection_range = user_selection.getRangeAt(0);
+        // collapse the range
+        if (!first_selection_range.collapsed){
+            first_selection_range.collapse(true);
+        }
+        // get the background color the user has chosed 
+        var node_background = $("#block_color").val(); // bg-primary, bg-secondary, etc
+
+        // now create the block
+        var block = create_node("div", [
+            create_node("h1", [
+                create_text_node("enter header", []),
+            ]),
+            create_node("p", [
+                create_text_node("enter body", []),
+            ]),
+        ], node_background + " pt-3 pb-3 pl-5 pr-5 text-light");
+
+        // and add it to the selection
+        first_selection_range.insertNode(block);
+        // add some extra space after the block
+
+        // now close the modal
+        $("#insert_modal").modal("hide");
+    });
+
+</script>
